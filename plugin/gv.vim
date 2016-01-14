@@ -133,6 +133,7 @@ function! s:maps()
   nnoremap <silent> <buffer> <cr> :call <sid>open(0)<cr>
   nnoremap <silent> <buffer> o    :call <sid>open(0)<cr>
   nnoremap <silent> <buffer> O    :call <sid>open(0, 1)<cr>
+  xnoremap <silent> <buffer> <cr> :<c-u>call <sid>open(1)<cr>
   xnoremap <silent> <buffer> o    :<c-u>call <sid>open(1)<cr>
   xnoremap <silent> <buffer> O    :<c-u>call <sid>open(1, 1)<cr>
 endfunction
