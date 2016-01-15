@@ -34,6 +34,11 @@ Usage
 - `gb` for `:Gbrowse`
 - `q` to close
 
+Screenshot
+-------------
+
+![screenshot](screenshot/screenshot.png)
+
 Customization
 -------------
 
