@@ -94,6 +94,7 @@ function! s:open(visual, ...)
   call s:split(a:0)
   if type == 'commit'
     execute 'e' target
+    nnoremap <silent> <buffer> gb :Gbrowse<cr>
   elseif type == 'diff'
     call s:scratch()
     call s:fill(target)
