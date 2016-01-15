@@ -44,7 +44,7 @@ function! s:gbrowse()
   execute 'Gbrowse' sha
 endfunction
 
-function! s:type(visual, splitview)
+function! s:type(visual)
   if a:visual
     let shas = filter(map(getline("'<", "'>"), 's:sha(v:val)'), '!empty(v:val)')
     if len(shas) < 2
@@ -70,16 +70,20 @@ function! s:type(visual, splitview)
   return [0, 0]
 endfunction
 
-function! s:close()
-  if winnr('$') > 1
-    execute winnr('$').'close'
+function! s:split(tab)
+  if a:tab
+    tabnew
+  elseif getwinvar(winnr('$'), 'gv')
+    $wincmd w
+    enew
+  else
+    vertical botright new
   endif
+  let w:gv = 1
 endfunction
 
 function! s:open(visual, ...)
-  let splitview = !a:0
-  let pos = splitview ? 'vertical botright' : 'tab'
-  let [type, target] = s:type(a:visual, splitview)
+  let [type, target] = s:type(a:visual)
 
   if empty(type)
     return s:shrug()
@@ -87,21 +91,16 @@ function! s:open(visual, ...)
     return s:browse(target)
   endif
 
-  if splitview
-    call s:close()
-  endif
+  call s:split(a:0)
   if type == 'commit'
-    execute pos 'split' target
+    execute 'e' target
   elseif type == 'diff'
-    execute pos 'new'
     call s:scratch()
     call s:fill(target)
     setf diff
   endif
   nnoremap <silent> <buffer> q :close<cr>
-  if splitview
-    wincmd p
-  endif
+  wincmd p
   echo
 endfunction
 
