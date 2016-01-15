@@ -106,6 +106,7 @@ function! s:open(visual, ...)
 endfunction
 
 function! s:syntax()
+  setf GV
   syn clear
   syn match gvInfo    /^[^0-9]*\zs[0-9-]\+\s\+[a-f0-9]\+ / contains=gvDate,gvSha nextgroup=gvMessage,gvMeta
   syn match gvDate    /\S\+ / contained
@@ -186,9 +187,8 @@ function! s:list(fugitive_repo, log_opts)
   if !exists(':Gbrowse')
     doautocmd User Fugitive
   endif
-
-  call s:syntax()
   call s:maps()
+  call s:syntax()
   redraw
   echo 'o: open split / O: open tab / gb: Gbrowse / q: quit'
 endfunction
