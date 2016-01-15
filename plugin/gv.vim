@@ -20,10 +20,6 @@
 " OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 " THE SOFTWARE.
 
-function! s:system(cmd)
-  return get(systemlist(a:cmd), 0, '')
-endfunction
-
 function! s:warn(message)
   echohl WarningMsg | echom a:message | echohl None
 endfunction
@@ -54,7 +50,7 @@ function! s:type(visual, splitview)
     if len(shas) < 2
       return [0, 0]
     endif
-    return ['diff', printf('git diff %s %s', shas[-1], shas[0])]
+    return ['diff', fugitive#repo().git_command('diff', shas[-1], shas[0])]
   endif
 
   if exists('b:git_origin')
@@ -138,33 +134,22 @@ function! s:maps()
   xnoremap <silent> <buffer> O    :<c-u>call <sid>open(1, 1)<cr>
 endfunction
 
-function! s:setup(bang)
-  let opts = {}
+function! s:setup(git_dir, git_origin)
+  tabnew
+  call s:scratch()
 
-  if !exists('g:loaded_fugitive')
-    return s:warn('fugitive not found')
-  endif
-
-  let opts.root = s:system('git rev-parse --show-toplevel').'/.git'
-  if v:shell_error
-    return s:warn('not in git repo')
-  endif
-
-  let current = expand('%:S')
-  if a:bang && !empty(current)
-    call system('git ls-files --error-unmatch '.current)
-    if !v:shell_error
-      let opts.log_opts = ' --follow '.current
-    endif
-  endif
-
-  let origin = matchstr(s:system('git config remote.origin.url'),
-                      \ 'github.com[/:]\zs.\{-}\ze\(.git\)\?$')
+  let origin = matchstr(a:git_origin, 'github.com[/:]\zs.\{-}\ze\(.git\)\?$')
   if !empty(origin)
-    let opts.origin = 'https://github.com/'.origin
+    let b:git_origin = 'https://github.com/'.origin
   endif
+  let b:git_dir = a:git_dir
+endfunction
 
-  return opts
+function! s:git_dir()
+  if empty(get(b:, 'git_dir', ''))
+    return fugitive#extract_git_dir(expand('%:p'))
+  endif
+  return b:git_dir
 endfunction
 
 function! s:scratch()
@@ -178,18 +163,24 @@ function! s:fill(cmd)
   setlocal nomodifiable
 endfunction
 
-function! s:list(opts)
-  tabnew
-  call s:scratch()
+function! s:log_opts(fugitive_repo, bang)
+  let current = expand('%')
+  if a:bang && !empty(current)
+    call system(a:fugitive_repo.git_command('ls-files', '--error-unmatch', current))
+    if !v:shell_error
+      return ['--follow', current]
+    endif
+  endif
+  return []
+endfunction
 
-  let cmd = 'git log --graph --color=never --date=short --format="%cd %h%d %s"'
-  call s:fill(cmd.get(a:opts, 'log_opts', ''))
+function! s:list(fugitive_repo, log_opts)
+  let default_opts = ['--graph', '--color=never', '--date=short', '--format=%cd %h%d %s']
+  let git_args = ['log'] + default_opts + a:log_opts
+  let git_log_cmd = call(a:fugitive_repo.git_command, git_args, a:fugitive_repo)
+  call s:fill(git_log_cmd)
   setlocal nowrap cursorline iskeyword+=#
 
-  let b:git_dir = a:opts.root
-  if has_key(a:opts, 'origin')
-    let b:git_origin = a:opts.origin
-  endif
   if !exists(':Gbrowse')
     doautocmd User Fugitive
   endif
@@ -201,10 +192,19 @@ function! s:list(opts)
 endfunction
 
 function! s:gv(bang) abort
-  let opts = s:setup(a:bang)
-  if !empty(opts)
-    call s:list(opts)
+  if !exists('g:loaded_fugitive')
+    return s:warn('fugitive not found')
   endif
+
+  let git_dir = s:git_dir()
+  if empty(git_dir)
+    return s:warn('not in git repo')
+  endif
+
+  let fugitive_repo = fugitive#repo(git_dir)
+  let log_opts = s:log_opts(fugitive_repo, a:bang)
+  call s:setup(git_dir, fugitive_repo.config('remote.origin.url'))
+  call s:list(fugitive_repo, log_opts)
 endfunction
 
 command! -bang GV call s:gv(<bang>0)
