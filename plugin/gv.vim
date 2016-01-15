@@ -110,7 +110,8 @@ function! s:syntax()
   syn match gvInfo    /^[^0-9]*\zs[0-9-]\+\s\+[a-f0-9]\+ / contains=gvDate,gvSha nextgroup=gvMessage,gvMeta
   syn match gvDate    /\S\+ / contained
   syn match gvSha     /[a-f0-9]\{6,}/ contained
-  syn match gvMessage /.*$/ contained contains=gvTag,gvGitHub,gvJira
+  syn match gvMessage /.* \ze(.\{-})$/ contained contains=gvTag,gvGitHub,gvJira nextgroup=gvAuthor
+  syn match gvAuthor  /.*$/ contained
   syn match gvMeta    /([^)]\+) / contained contains=gvTag nextgroup=gvMessage
   syn match gvTag     /(tag:[^)]\+)/ contained
   syn match gvGitHub  /\<#[0-9]\+\>/ contained
@@ -121,6 +122,7 @@ function! s:syntax()
   hi  link  gvGitHub  Label
   hi  link  gvJira    Label
   hi  link  gvMeta    Conditional
+  hi  link  gvAuthor  String
 endfunction
 
 function! s:maps()
@@ -175,7 +177,7 @@ function! s:log_opts(fugitive_repo, bang)
 endfunction
 
 function! s:list(fugitive_repo, log_opts)
-  let default_opts = ['--graph', '--color=never', '--date=short', '--format=%cd %h%d %s']
+  let default_opts = ['--graph', '--color=never', '--date=short', '--format=%cd %h%d %s (%an)']
   let git_args = ['log'] + default_opts + a:log_opts
   let git_log_cmd = call(a:fugitive_repo.git_command, git_args, a:fugitive_repo)
   call s:fill(git_log_cmd)
