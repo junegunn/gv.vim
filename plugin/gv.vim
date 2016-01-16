@@ -117,13 +117,13 @@ function! s:syntax()
   syn match gvTag     /(tag:[^)]\+)/ contained
   syn match gvGitHub  /\<#[0-9]\+\>/ contained
   syn match gvJira    /\<[A-Z]\+-[0-9]\+\>/ contained
-  hi  link  gvDate    Number
-  hi  link  gvSha     Identifier
-  hi  link  gvTag     Constant
-  hi  link  gvGitHub  Label
-  hi  link  gvJira    Label
-  hi  link  gvMeta    Conditional
-  hi  link  gvAuthor  String
+  hi def link gvDate   Number
+  hi def link gvSha    Identifier
+  hi def link gvTag    Constant
+  hi def link gvGitHub Label
+  hi def link gvJira   Label
+  hi def link gvMeta   Conditional
+  hi def link gvAuthor String
 endfunction
 
 function! s:maps()
