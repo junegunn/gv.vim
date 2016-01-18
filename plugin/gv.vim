@@ -101,6 +101,10 @@ function! s:open(visual, ...)
     setf diff
   endif
   nnoremap <silent> <buffer> q :close<cr>
+  let bang = a:0 ? '!' : ''
+  if exists('#User#GV'.bang)
+    execute 'doautocmd User GV'.bang
+  endif
   wincmd p
   echo
 endfunction
