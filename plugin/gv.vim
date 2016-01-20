@@ -145,9 +145,19 @@ function! s:setup(git_dir, git_origin)
   tabnew
   call s:scratch()
 
-  let origin = matchstr(a:git_origin, 'github.com[/:]\zs.\{-}\ze\(.git\)\?$')
+  if exists('g:fugitive_github_domains')
+    let domain = join(map(extend(['github.com'], g:fugitive_github_domains),
+          \ 'escape(substitute(split(v:val, "://")[-1], "/*$", "", ""), ".")'), '\|')
+  else
+    let domain = '.\+github.\+'
+  endif
+  " https://  github.com  /  junegunn/gv.vim  .git
+  " git@      github.com  :  junegunn/gv.vim  .git
+  let pat = '^\(https\?://\|git@\)\('.domain.'\)[:/]\([^@:/]\+/[^@:/]\{-}\)\%(.git\)\?$'
+  let origin = matchlist(a:git_origin, pat)
   if !empty(origin)
-    let b:git_origin = 'https://github.com/'.origin
+    let scheme = origin[1] =~ '^http' ? origin[1] : 'https://'
+    let b:git_origin = printf('%s%s/%s', scheme, origin[2], origin[3])
   endif
   let b:git_dir = a:git_dir
 endfunction
