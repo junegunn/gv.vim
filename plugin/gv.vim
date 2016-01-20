@@ -218,9 +218,15 @@ function! s:gv(bang) abort
   endif
 
   let fugitive_repo = fugitive#repo(git_dir)
-  let log_opts = s:log_opts(fugitive_repo, a:bang)
-  call s:setup(git_dir, fugitive_repo.config('remote.origin.url'))
-  call s:list(fugitive_repo, log_opts)
+  let cd = exists('*haslocaldir') && haslocaldir() ? 'lcd' : 'cd'
+  try
+    execute cd fugitive_repo.tree()
+    let log_opts = s:log_opts(fugitive_repo, a:bang)
+    call s:setup(git_dir, fugitive_repo.config('remote.origin.url'))
+    call s:list(fugitive_repo, log_opts)
+  finally
+    execute cd '-'
+  endtry
 endfunction
 
 command! -bang GV call s:gv(<bang>0)
