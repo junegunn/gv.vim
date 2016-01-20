@@ -188,11 +188,11 @@ function! s:log_opts(fugitive_repo, bang)
       return ['--follow', current]
     endif
   endif
-  return []
+  return ['--graph']
 endfunction
 
 function! s:list(fugitive_repo, log_opts)
-  let default_opts = ['--graph', '--color=never', '--date=short', '--format=%cd %h%d %s (%an)']
+  let default_opts = ['--color=never', '--date=short', '--format=%cd %h%d %s (%an)']
   let git_args = ['log'] + default_opts + a:log_opts
   let git_log_cmd = call(a:fugitive_repo.git_command, git_args, a:fugitive_repo)
   call s:fill(git_log_cmd)
@@ -218,9 +218,15 @@ function! s:gv(bang) abort
   endif
 
   let fugitive_repo = fugitive#repo(git_dir)
-  let log_opts = s:log_opts(fugitive_repo, a:bang)
-  call s:setup(git_dir, fugitive_repo.config('remote.origin.url'))
-  call s:list(fugitive_repo, log_opts)
+  let cd = exists('*haslocaldir') && haslocaldir() ? 'lcd' : 'cd'
+  try
+    execute cd fugitive_repo.tree()
+    let log_opts = s:log_opts(fugitive_repo, a:bang)
+    call s:setup(git_dir, fugitive_repo.config('remote.origin.url'))
+    call s:list(fugitive_repo, log_opts)
+  finally
+    execute cd '-'
+  endtry
 endfunction
 
 command! -bang GV call s:gv(<bang>0)
