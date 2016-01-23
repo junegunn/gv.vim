@@ -193,7 +193,7 @@ endfunction
 
 function! s:list(fugitive_repo, log_opts)
   let default_opts = ['--color=never', '--date=short', '--format=%cd %h%d %s (%an)']
-  let git_args = ['log'] + default_opts + a:log_opts
+  let git_args = ['log'] + a:log_opts + default_opts
   let git_log_cmd = call(a:fugitive_repo.git_command, git_args, a:fugitive_repo)
   call s:fill(git_log_cmd)
   setlocal nowrap cursorline iskeyword+=#
@@ -207,7 +207,29 @@ function! s:list(fugitive_repo, log_opts)
   echo 'o: open split / O: open tab / gb: Gbrowse / q: quit'
 endfunction
 
-function! s:gv(bang) abort
+function! s:trim(arg)
+  let arg = substitute(a:arg, '\s*$', '', '')
+  return arg =~ "^'.*'$" ? substitute(arg[1:-2], "''", '', 'g')
+     \ : arg =~ '^".*"$' ? substitute(substitute(arg[1:-2], '""', '', 'g'), '\\"', '"', 'g')
+     \ : substitute(substitute(arg, '""\|''''', '', 'g'), '\\ ', ' ', 'g')
+endfunction
+
+function! gv#shellwords(arg)
+  let words = []
+  let contd = 0
+  for token in split(a:arg, '\%(\%(''\%([^'']\|''''\)\+''\)\|\%("\%(\\"\|[^"]\)\+"\)\|\%(\%(\\ \|\S\)\+\)\)\s*\zs')
+    let trimmed = s:trim(token)
+    if contd
+      let words[-1] .= trimmed
+    else
+      call add(words, trimmed)
+    endif
+    let contd = token !~ '\s\+$'
+  endfor
+  return words
+endfunction
+
+function! s:gv(bang, args) abort
   if !exists('g:loaded_fugitive')
     return s:warn('fugitive not found')
   endif
@@ -221,7 +243,7 @@ function! s:gv(bang) abort
   let cd = exists('*haslocaldir') && haslocaldir() ? 'lcd' : 'cd'
   try
     execute cd fugitive_repo.tree()
-    let log_opts = s:log_opts(fugitive_repo, a:bang)
+    let log_opts = extend(gv#shellwords(a:args), s:log_opts(fugitive_repo, a:bang))
     call s:setup(git_dir, fugitive_repo.config('remote.origin.url'))
     call s:list(fugitive_repo, log_opts)
   finally
@@ -229,4 +251,4 @@ function! s:gv(bang) abort
   endtry
 endfunction
 
-command! -bang GV call s:gv(<bang>0)
+command! -bang -nargs=* GV call s:gv(<bang>0, <q-args>)

@@ -1,0 +1,13 @@
+Execute (Test gv#shellwords):
+  AssertEqual [],                   gv#shellwords('')
+  AssertEqual ['foo', 'bar'],       gv#shellwords('foo bar')
+  AssertEqual ['foo  bar'],         gv#shellwords("'foo  bar'")
+  AssertEqual ['foo  bar'],         gv#shellwords('"foo  bar"')
+  AssertEqual ['foo  bar'],         gv#shellwords('"foo "'' bar''')
+  AssertEqual ['foo  bar'],         gv#shellwords('''foo ''" bar"')
+  AssertEqual ['foo  bar'],         gv#shellwords("'foo '' bar'")
+  AssertEqual ['foo  bar'],         gv#shellwords('"foo "" bar"')
+  AssertEqual ['foo  bar'],         gv#shellwords('foo\ \ bar')
+  AssertEqual ['foo " bar'],        gv#shellwords('"foo \" bar"')
+  AssertEqual ['foo " bar', 'baz'], gv#shellwords("'foo \" bar' baz")
+  AssertEqual ['foo', 'bar baz'],   gv#shellwords("'foo' 'bar baz'")
