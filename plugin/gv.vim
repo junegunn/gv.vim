@@ -180,12 +180,12 @@ function! s:fill(cmd)
   setlocal nomodifiable
 endfunction
 
-function! s:log_opts(fugitive_repo, bang)
+function! s:log_opts(fugitive_repo, bang, visual, line1, line2)
   let current = expand('%')
-  if a:bang && !empty(current)
+  if !empty(current) && (a:visual || a:bang)
     call system(a:fugitive_repo.git_command('ls-files', '--error-unmatch', current))
     if !v:shell_error
-      return ['--follow', current]
+      return a:visual ? [printf('-L%d,%d:%s', a:line1, a:line2, current)] : ['--follow', current]
     endif
   endif
   return ['--graph']
@@ -229,7 +229,7 @@ function! gv#shellwords(arg)
   return words
 endfunction
 
-function! s:gv(bang, args) abort
+function! s:gv(bang, visual, line1, line2, args) abort
   if !exists('g:loaded_fugitive')
     return s:warn('fugitive not found')
   endif
@@ -243,7 +243,7 @@ function! s:gv(bang, args) abort
   let cd = exists('*haslocaldir') && haslocaldir() ? 'lcd' : 'cd'
   try
     execute cd fugitive_repo.tree()
-    let log_opts = extend(gv#shellwords(a:args), s:log_opts(fugitive_repo, a:bang))
+    let log_opts = extend(gv#shellwords(a:args), s:log_opts(fugitive_repo, a:bang, a:visual, a:line1, a:line2))
     call s:setup(git_dir, fugitive_repo.config('remote.origin.url'))
     call s:list(fugitive_repo, log_opts)
   finally
@@ -251,4 +251,4 @@ function! s:gv(bang, args) abort
   endtry
 endfunction
 
-command! -bang -nargs=* GV call s:gv(<bang>0, <q-args>)
+command! -bang -nargs=* -range=0 GV call s:gv(<bang>0, <count>, <line1>, <line2>, <q-args>)

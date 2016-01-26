@@ -27,6 +27,7 @@ Usage
 
 - `:GV` to open commit browser
     - `:GV!` will only list commits for the current file
+- `:GV` over visual range will list commits for the lines
 
 You can pass `git log` options to the command, e.g. `:GV -S foobar`.
 
