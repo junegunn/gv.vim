@@ -29,7 +29,7 @@ function! s:shrug()
 endfunction
 
 function! s:sha(...)
-  return matchstr(get(a:000, 0, getline('.')), '^[^0-9]*[0-9-]\+\s\+\zs[a-f0-9]\+')
+  return matchstr(get(a:000, 0, getline('.')), '^[^0-9]*[0-9]\{4}-[0-9]\{2}-[0-9]\{2}\s\+\zs[a-f0-9]\+')
 endfunction
 
 function! s:browse(url)
@@ -128,6 +128,19 @@ function! s:syntax()
   hi def link gvJira   Label
   hi def link gvMeta   Conditional
   hi def link gvAuthor String
+
+  syn match diffAdded   "^+.*"
+  syn match diffRemoved "^-.*"
+  syn match diffLine    "^@.*"
+  syn match diffFile    "^diff\>.*"
+  syn match diffFile    "^+++ .*"
+  syn match diffNewFile "^--- .*"
+  hi def link diffFile    Type
+  hi def link diffNewFile diffFile
+  hi def link diffAdded   Identifier
+  hi def link diffRemoved Special
+  hi def link diffFile    Type
+  hi def link diffLine    Statement
 endfunction
 
 function! s:maps()
