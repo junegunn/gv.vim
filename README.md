@@ -37,6 +37,7 @@ You can pass `git log` options to the command, e.g. `:GV -S foobar`.
 - `o` or `<cr>` on commits to display the diff in the range
 - `O` opens a new tab instead
 - `gb` for `:Gbrowse`
+- `]]` and `[[` to move between commits
 - `q` to close
 
 Customization
