@@ -28,8 +28,15 @@ function! s:shrug()
   call s:warn('¯\_(ツ)_/¯')
 endfunction
 
+let s:begin = '^[^0-9]*[0-9]\{4}-[0-9]\{2}-[0-9]\{2}\s\+'
+
 function! s:sha(...)
-  return matchstr(get(a:000, 0, getline('.')), '^[^0-9]*[0-9]\{4}-[0-9]\{2}-[0-9]\{2}\s\+\zs[a-f0-9]\+')
+  return matchstr(get(a:000, 0, getline('.')), s:begin.'\zs[a-f0-9]\+')
+endfunction
+
+function! s:move(flag)
+  let [l, c] = searchpos(s:begin, a:flag)
+  return l ? printf('%dG%d|', l, c) : ''
 endfunction
 
 function! s:browse(url)
@@ -152,6 +159,14 @@ function! s:maps()
   xnoremap <silent> <buffer> <cr> :<c-u>call <sid>open(1)<cr>
   xnoremap <silent> <buffer> o    :<c-u>call <sid>open(1)<cr>
   xnoremap <silent> <buffer> O    :<c-u>call <sid>open(1, 1)<cr>
+  nnoremap <silent> <buffer> <expr> ]] <sid>move('')
+  nnoremap <silent> <buffer> <expr> ][ <sid>move('')
+  nnoremap <silent> <buffer> <expr> [[ <sid>move('b')
+  nnoremap <silent> <buffer> <expr> [] <sid>move('b')
+  xnoremap <silent> <buffer> <expr> ]] <sid>move('')
+  xnoremap <silent> <buffer> <expr> ][ <sid>move('')
+  xnoremap <silent> <buffer> <expr> [[ <sid>move('b')
+  xnoremap <silent> <buffer> <expr> [] <sid>move('b')
 endfunction
 
 function! s:setup(git_dir, git_origin)
