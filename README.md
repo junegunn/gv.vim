@@ -5,8 +5,9 @@ A git commit browser.
 
 ![gv](https://cloud.githubusercontent.com/assets/700826/12355378/8bbf0834-bbdf-11e5-9389-1aba7cd1fec1.png)
 
-gitv is nice. But I needed a faster, and possibly simpler alternative that
-I can use with a project with thousands of commits.
+[gitv](https://github.com/gregsexton/gitv) is nice. But I needed a faster, and
+possibly simpler alternative that I can use with a project with thousands of
+commits.
 
 Installation
 ------------
