@@ -39,6 +39,7 @@ You can pass `git log` options to the command, e.g. `:GV -S foobar`.
 - `O` opens a new tab instead
 - `gb` for `:Gbrowse`
 - `]]` and `[[` to move between commits
+- `.` to start command-line with `:Git [CURSOR] SHA` à la fugitive
 - `q` to close
 
 Customization

@@ -116,6 +116,11 @@ function! s:open(visual, ...)
   echo
 endfunction
 
+function! s:dot()
+  let sha = s:sha()
+  return empty(sha) ? '' : ':Git  '.sha."\<s-left>\<left>"
+endfunction
+
 function! s:syntax()
   setf GV
   syn clear
@@ -159,6 +164,7 @@ function! s:maps()
   xnoremap <silent> <buffer> <cr> :<c-u>call <sid>open(1)<cr>
   xnoremap <silent> <buffer> o    :<c-u>call <sid>open(1)<cr>
   xnoremap <silent> <buffer> O    :<c-u>call <sid>open(1, 1)<cr>
+  nnoremap          <buffer> <expr> .  <sid>dot()
   nnoremap <silent> <buffer> <expr> ]] <sid>move('')
   nnoremap <silent> <buffer> <expr> ][ <sid>move('')
   nnoremap <silent> <buffer> <expr> [[ <sid>move('b')
