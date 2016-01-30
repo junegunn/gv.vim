@@ -183,7 +183,7 @@ function! s:setup(git_dir, git_origin)
     let domain = join(map(extend(['github.com'], g:fugitive_github_domains),
           \ 'escape(substitute(split(v:val, "://")[-1], "/*$", "", ""), ".")'), '\|')
   else
-    let domain = '.\+github.\+'
+    let domain = '.*github.\+'
   endif
   " https://  github.com  /  junegunn/gv.vim  .git
   " git@      github.com  :  junegunn/gv.vim  .git
