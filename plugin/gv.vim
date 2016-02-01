@@ -141,6 +141,11 @@ function! s:syntax()
   hi def link gvMeta   Conditional
   hi def link gvAuthor String
 
+  syn match gvAdded     "^\W*\zsA\t.*"
+  syn match gvDeleted   "^\W*\zsD\t.*"
+  hi def link gvAdded    diffAdded
+  hi def link gvDeleted  diffRemoved
+
   syn match diffAdded   "^+.*"
   syn match diffRemoved "^-.*"
   syn match diffLine    "^@.*"
@@ -230,7 +235,7 @@ function! s:list(fugitive_repo, log_opts)
   let git_args = ['log'] + default_opts + a:log_opts
   let git_log_cmd = call(a:fugitive_repo.git_command, git_args, a:fugitive_repo)
   call s:fill(git_log_cmd)
-  setlocal nowrap cursorline iskeyword+=#
+  setlocal nowrap tabstop=8 cursorline iskeyword+=#
 
   if !exists(':Gbrowse')
     doautocmd User Fugitive
