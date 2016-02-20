@@ -89,6 +89,11 @@ function! s:split(tab)
   let w:gv = 1
 endfunction
 
+function! s:close()
+       wincmd l
+       close
+endfunction
+
 function! s:open(visual, ...)
   let [type, target] = s:type(a:visual)
 
@@ -107,7 +112,7 @@ function! s:open(visual, ...)
     call s:fill(target)
     setf diff
   endif
-  nnoremap <silent> <buffer> q :close<cr>
+  nnoremap <silent> <buffer> q :call <sid>close()<cr>
   let bang = a:0 ? '!' : ''
   if exists('#User#GV'.bang)
     execute 'doautocmd User GV'.bang
@@ -161,7 +166,7 @@ function! s:syntax()
 endfunction
 
 function! s:maps()
-  nnoremap <silent> <buffer> q    :tabclose<cr>
+  nnoremap <silent> <buffer> q    :call <sid>close()<cr>
   nnoremap <silent> <buffer> gb   :call <sid>gbrowse()<cr>
   nnoremap <silent> <buffer> <cr> :call <sid>open(0)<cr>
   nnoremap <silent> <buffer> o    :call <sid>open(0)<cr>
