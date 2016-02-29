@@ -281,9 +281,11 @@ function! s:gv(bang, visual, line1, line2, args) abort
   let fugitive_repo = fugitive#repo(git_dir)
   let cd = exists('*haslocaldir') && haslocaldir() ? 'lcd' : 'cd'
   let cwd = getcwd()
+  let croot = systemlist('git rev-parse --show-toplevel')[0]
+  let croot = v:shell_error ? cwd : croot
   let root = fugitive_repo.tree()
   try
-    if cwd !=# root
+    if croot !=# root
       execute cd root
     endif
     let log_opts = extend(gv#shellwords(a:args), s:log_opts(fugitive_repo, a:bang, a:visual, a:line1, a:line2))
