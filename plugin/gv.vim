@@ -280,13 +280,19 @@ function! s:gv(bang, visual, line1, line2, args) abort
 
   let fugitive_repo = fugitive#repo(git_dir)
   let cd = exists('*haslocaldir') && haslocaldir() ? 'lcd' : 'cd'
+  let cwd = getcwd()
+  let root = fugitive_repo.tree()
   try
-    execute cd fugitive_repo.tree()
+    if cwd !=# root
+      execute cd root
+    endif
     let log_opts = extend(gv#shellwords(a:args), s:log_opts(fugitive_repo, a:bang, a:visual, a:line1, a:line2))
     call s:setup(git_dir, fugitive_repo.config('remote.origin.url'))
     call s:list(fugitive_repo, log_opts)
   finally
-    execute cd '-'
+    if getcwd() !=# cwd
+      cd -
+    endif
   endtry
 endfunction
 
