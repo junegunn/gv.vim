@@ -110,7 +110,7 @@ function! s:open(visual, ...)
   nnoremap <silent> <buffer> q :close<cr>
   let bang = a:0 ? '!' : ''
   if exists('#User#GV'.bang)
-    execute 'doautocmd User GV'.bang
+    execute 'doautocmd <nomodeline> User GV'.bang
   endif
   wincmd p
   echo
@@ -238,7 +238,7 @@ function! s:list(fugitive_repo, log_opts)
   setlocal nowrap tabstop=8 cursorline iskeyword+=#
 
   if !exists(':Gbrowse')
-    doautocmd User Fugitive
+    doautocmd <nomodeline> User Fugitive
   endif
   call s:maps()
   call s:syntax()
