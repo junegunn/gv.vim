@@ -79,7 +79,7 @@ endfunction
 
 function! s:split(tab)
   if a:tab
-    tabnew
+    execute (tabpagenr()-1).'tabnew'
   elseif getwinvar(winnr('$'), 'gv')
     $wincmd w
     enew
@@ -181,7 +181,7 @@ function! s:maps()
 endfunction
 
 function! s:setup(git_dir, git_origin)
-  tabnew
+  execute (tabpagenr()-1).'tabnew'
   call s:scratch()
 
   if exists('g:fugitive_github_domains')
