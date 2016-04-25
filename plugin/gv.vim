@@ -223,7 +223,9 @@ function! s:log_opts(fugitive_repo, bang, visual, line1, line2)
   let current = expand('%')
   if !empty(current) && (a:visual || a:bang)
     call system(a:fugitive_repo.git_command('ls-files', '--error-unmatch', current))
-    if !v:shell_error
+    if v:shell_error
+      throw current.' is untracked'
+    else
       return a:visual ? [printf('-L%d,%d:%s', a:line1, a:line2, current)] : ['--follow', current]
     endif
   endif
@@ -291,6 +293,8 @@ function! s:gv(bang, visual, line1, line2, args) abort
     let log_opts = extend(gv#shellwords(a:args), s:log_opts(fugitive_repo, a:bang, a:visual, a:line1, a:line2))
     call s:setup(git_dir, fugitive_repo.config('remote.origin.url'))
     call s:list(fugitive_repo, log_opts)
+  catch
+    return s:warn(v:exception)
   finally
     if getcwd() !=# cwd
       cd -
