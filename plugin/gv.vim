@@ -43,6 +43,10 @@ function! s:browse(url)
   call netrw#BrowseX(b:git_origin.a:url, 0)
 endfunction
 
+function! s:tabnew()
+  execute (tabpagenr()-1).'tabnew'
+endfunction
+
 function! s:gbrowse()
   let sha = s:sha()
   if empty(sha)
@@ -79,7 +83,7 @@ endfunction
 
 function! s:split(tab)
   if a:tab
-    execute (tabpagenr()-1).'tabnew'
+    call s:tabnew()
   elseif getwinvar(winnr('$'), 'gv')
     $wincmd w
     enew
@@ -181,7 +185,7 @@ function! s:maps()
 endfunction
 
 function! s:setup(git_dir, git_origin)
-  execute (tabpagenr()-1).'tabnew'
+  call s:tabnew()
   call s:scratch()
 
   if exists('g:fugitive_github_domains')
@@ -219,11 +223,15 @@ function! s:fill(cmd)
   setlocal nomodifiable
 endfunction
 
+function! s:tracked(fugitive_repo, file)
+  call system(a:fugitive_repo.git_command('ls-files', '--error-unmatch', a:file))
+  return !v:shell_error
+endfunction
+
 function! s:log_opts(fugitive_repo, bang, visual, line1, line2)
   let current = expand('%')
   if !empty(current) && (a:visual || a:bang)
-    call system(a:fugitive_repo.git_command('ls-files', '--error-unmatch', current))
-    if v:shell_error
+    if !s:tracked(a:fugitive_repo, current)
       throw current.' is untracked'
     else
       return a:visual ? [printf('-L%d,%d:%s', a:line1, a:line2, current)] : ['--follow', current]
