@@ -228,14 +228,19 @@ function! s:tracked(fugitive_repo, file)
   return !v:shell_error
 endfunction
 
+function! s:check_buffer(fugitive_repo, current)
+  if empty(a:current)
+    throw 'untracked buffer'
+  elseif !s:tracked(a:fugitive_repo, a:current)
+    throw a:current.' is untracked'
+  endif
+endfunction
+
 function! s:log_opts(fugitive_repo, bang, visual, line1, line2)
-  let current = expand('%')
-  if !empty(current) && (a:visual || a:bang)
-    if !s:tracked(a:fugitive_repo, current)
-      throw current.' is untracked'
-    else
-      return a:visual ? [printf('-L%d,%d:%s', a:line1, a:line2, current)] : ['--follow', current]
-    endif
+  if a:visual || a:bang
+    let current = expand('%')
+    call s:check_buffer(a:fugitive_repo, current)
+    return a:visual ? [printf('-L%d,%d:%s', a:line1, a:line2, current)] : ['--follow', current]
   endif
   return ['--graph']
 endfunction
