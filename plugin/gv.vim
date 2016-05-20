@@ -283,6 +283,31 @@ function! gv#shellwords(arg)
   return words
 endfunction
 
+function! s:gl(buf, visual)
+  if !exists(':Gllog')
+    return
+  endif
+  tab split
+  silent execute a:visual ? "'<,'>" : "" 'Gllog'
+  call setloclist(0, insert(getloclist(0), {'bufnr': a:buf}, 0))
+  " b #
+  lopen
+  xnoremap <buffer> o :call <sid>gld()<cr>
+  nnoremap <buffer> o <cr><c-w><c-w>
+  nnoremap <buffer> q :tabclose<cr>
+  call matchadd('Conceal', '^fugitive:///.\{-}\.git//')
+  call matchadd('Conceal', '^fugitive:///.\{-}\.git//\x\{7}\zs.\{-}||')
+  setlocal concealcursor=nv conceallevel=3 nowrap
+  let w:quickfix_title = 'o: open / o (in visual): diff / q: quit'
+endfunction
+
+function! s:gld() range
+  let [to, from] = map([a:firstline, a:lastline], 'split(getline(v:val), "|")[0]')
+  execute 'tabedit' to
+  execute 'vsplit'  from
+  windo diffthis
+endfunction
+
 function! s:gv(bang, visual, line1, line2, args) abort
   if !exists('g:loaded_fugitive')
     return s:warn('fugitive not found')
@@ -301,9 +326,17 @@ function! s:gv(bang, visual, line1, line2, args) abort
     if cwd !=# root
       execute cd root
     endif
-    let log_opts = extend(gv#shellwords(a:args), s:log_opts(fugitive_repo, a:bang, a:visual, a:line1, a:line2))
-    call s:setup(git_dir, fugitive_repo.config('remote.origin.url'))
-    call s:list(fugitive_repo, log_opts)
+    if a:args =~ '?$'
+      if len(a:args) > 1
+        return s:warn('invalid arguments')
+      endif
+      call s:check_buffer(fugitive_repo, expand('%'))
+      call s:gl(bufnr(''), a:visual)
+    else
+      let log_opts = extend(gv#shellwords(a:args), s:log_opts(fugitive_repo, a:bang, a:visual, a:line1, a:line2))
+      call s:setup(git_dir, fugitive_repo.config('remote.origin.url'))
+      call s:list(fugitive_repo, log_opts)
+    endif
   catch
     return s:warn(v:exception)
   finally

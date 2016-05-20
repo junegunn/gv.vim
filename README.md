@@ -27,10 +27,12 @@ Usage
 ### Commands
 
 - `:GV` to open commit browser
-    - `:GV!` will only list commits for the current file
-- `:GV` over visual range will list commits for the lines
+    - You can pass `git log` options to the command, e.g. `:GV -S foobar`.
+- `:GV!` will only list commits that affected the current file
+- `:GV?` fills the quickfix window with the revisions of the current file
 
-You can pass `git log` options to the command, e.g. `:GV -S foobar`.
+`:GV` or `:GV?` can be used in visual mode to track the changes in the
+selected lines.
 
 ### Mappings
 
