@@ -183,10 +183,10 @@ function! s:maps()
   xnoremap <silent> <buffer> <expr> [[ <sid>move('b')
   xnoremap <silent> <buffer> <expr> [] <sid>move('b')
 
-  nmap     <silent> <buffer> <C-n> ]]<cr>
-  xmap     <silent> <buffer> <C-n> ]]<cr>
-  nmap              <buffer> <C-p> [[<cr>
-  xmap              <buffer> <C-p> [[<cr>
+  nmap              <buffer> <C-n> ]]o
+  nmap              <buffer> <C-p> [[o
+  xmap              <buffer> <C-n> ]]ogv
+  xmap              <buffer> <C-p> [[ogv
 endfunction
 
 function! s:setup(git_dir, git_origin)
