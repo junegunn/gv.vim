@@ -11,3 +11,17 @@ Execute (Test gv#shellwords):
   AssertEqual ['foo " bar'],        gv#shellwords('"foo \" bar"')
   AssertEqual ['foo " bar', 'baz'], gv#shellwords("'foo \" bar' baz")
   AssertEqual ['foo', 'bar baz'],   gv#shellwords("'foo' 'bar baz'")
+
+Execute (Test gv#sha):
+  AssertEqual '33d2a88',    gv#sha('* 2016-06-18 33d2a88 Let fugitive add buffer-local Git command to GV buffer (Junegunn Choi)')
+  AssertEqual '4990bce',    gv#sha('| * 2016-03-05 4990bce <nomodeline> (Justin M. Keyes)')
+  AssertEqual '',           gv#sha('|/| | |   ')
+  AssertEqual 'fb213582e6', gv#sha('| * | | 2017-02-27 fb213582e6 fix typo retries (timchenxiaoyu)')
+  AssertEqual '',           gv#sha(' ')
+  AssertEqual '',           gv#sha('')
+
+Given (line text):
+  | * | | 2017-02-27 fb213582e6 fix typo retries (timchenxiaoyu)
+
+Execute:
+  AssertEqual 'fb213582e6', gv#sha()

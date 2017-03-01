@@ -30,7 +30,7 @@ endfunction
 
 let s:begin = '^[^0-9]*[0-9]\{4}-[0-9]\{2}-[0-9]\{2}\s\+'
 
-function! s:sha(...)
+function! gv#sha(...)
   return matchstr(get(a:000, 0, getline('.')), s:begin.'\zs[a-f0-9]\+')
 endfunction
 
@@ -48,7 +48,7 @@ function! s:tabnew()
 endfunction
 
 function! s:gbrowse()
-  let sha = s:sha()
+  let sha = gv#sha()
   if empty(sha)
     return s:shrug()
   endif
@@ -57,7 +57,7 @@ endfunction
 
 function! s:type(visual)
   if a:visual
-    let shas = filter(map(getline("'<", "'>"), 's:sha(v:val)'), '!empty(v:val)')
+    let shas = filter(map(getline("'<", "'>"), 'gv#sha(v:val)'), '!empty(v:val)')
     if len(shas) < 2
       return [0, 0]
     endif
@@ -74,7 +74,7 @@ function! s:type(visual)
     endif
   endif
 
-  let sha = s:sha()
+  let sha = gv#sha()
   if !empty(sha)
     return ['commit', 'fugitive://'.b:git_dir.'//'.sha]
   endif
@@ -121,7 +121,7 @@ function! s:open(visual, ...)
 endfunction
 
 function! s:dot()
-  let sha = s:sha()
+  let sha = gv#sha()
   return empty(sha) ? '' : ':Git  '.sha."\<s-left>\<left>"
 endfunction
 
