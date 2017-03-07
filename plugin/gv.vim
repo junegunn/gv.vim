@@ -104,7 +104,7 @@ function! s:open(visual, ...)
 
   call s:split(a:0)
   if type == 'commit'
-    execute 'e' target
+    execute 'e' escape(target, ' ')
     nnoremap <silent> <buffer> gb :Gbrowse<cr>
   elseif type == 'diff'
     call s:scratch()
@@ -309,9 +309,9 @@ endfunction
 
 function! s:gld() range
   let [to, from] = map([a:firstline, a:lastline], 'split(getline(v:val), "|")[0]')
-  execute (tabpagenr()-1).'tabedit' to
+  execute (tabpagenr()-1).'tabedit' escape(to, ' ')
   if from !=# to
-    execute 'vsplit' from
+    execute 'vsplit' escape(from, ' ')
     windo diffthis
   endif
 endfunction
@@ -332,7 +332,7 @@ function! s:gv(bang, visual, line1, line2, args) abort
   let root = fugitive_repo.tree()
   try
     if cwd !=# root
-      execute cd root
+      execute cd escape(root, ' ')
     endif
     if a:args =~ '?$'
       if len(a:args) > 1
