@@ -297,6 +297,12 @@ function! s:gl(buf, visual)
   call setloclist(0, insert(getloclist(0), {'bufnr': a:buf}, 0))
   b #
   lopen
+  let title = 'o: open / o (in visual): diff / O: open (tab) / q: quit'
+  try
+    call setloclist(0, [], 'a', {'title': title})
+  catch
+    let w:quickfix_title = title
+  endtry
   xnoremap <buffer> o :call <sid>gld()<cr>
   nnoremap <buffer> o <cr><c-w><c-w>
   nnoremap <buffer> O :call <sid>gld()<cr>
@@ -304,7 +310,6 @@ function! s:gl(buf, visual)
   call matchadd('Conceal', '^fugitive:///.\{-}\.git//')
   call matchadd('Conceal', '^fugitive:///.\{-}\.git//\x\{7}\zs.\{-}||')
   setlocal concealcursor=nv conceallevel=3 nowrap
-  let w:quickfix_title = 'o: open / o (in visual): diff / O: open (tab) / q: quit'
 endfunction
 
 function! s:gld() range
