@@ -44,6 +44,11 @@ selected lines.
 - `.` to start command-line with `:Git [CURSOR] SHA` à la fugitive
 - `q` to close
 
+Screenshot
+-------------
+
+![screenshot](screenshot/screenshot.png)
+
 Customization
 -------------
 
