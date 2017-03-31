@@ -260,7 +260,11 @@ function! s:list(fugitive_repo, log_opts)
   if !exists(':Gbrowse')
     doautocmd <nomodeline> User Fugitive
   endif
-  call s:maps()
+
+  if !exists('g:gv_disable_default_mappings')
+    call s:maps()
+  endif
+
   call s:syntax()
   redraw
   echo 'o: open split / O: open tab / gb: Gbrowse / q: quit'
