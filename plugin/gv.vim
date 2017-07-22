@@ -218,7 +218,7 @@ function! s:git_dir()
 endfunction
 
 function! s:scratch()
-  setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile
+  setlocal buftype=nofile bufhidden=wipe noswapfile
 endfunction
 
 function! s:fill(cmd)
