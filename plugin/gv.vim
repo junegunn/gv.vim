@@ -360,4 +360,8 @@ function! s:gv(bang, visual, line1, line2, args) abort
   endtry
 endfunction
 
-command! -bang -nargs=* -range=0 GV call s:gv(<bang>0, <count>, <line1>, <line2>, <q-args>)
+function! s:gvcomplete(a, l, p) abort
+  return fugitive#repo().superglob(a:a)
+endfunction
+
+command! -bang -nargs=* -range=0 -complete=customlist,s:gvcomplete GV call s:gv(<bang>0, <count>, <line1>, <line2>, <q-args>)
