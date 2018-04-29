@@ -125,6 +125,13 @@ function! s:dot()
   return empty(sha) ? '' : ':Git  '.sha."\<s-left>\<left>"
 endfunction
 
+function! s:tilde()
+  let sha = gv#sha()
+  let g:gitgutter_diff_base = sha
+  GitGutter
+  call s:warn('GitGutter diff base set to commit '.sha)
+endfunction
+
 function! s:syntax()
   setf GV
   syn clear
@@ -174,6 +181,7 @@ function! s:maps()
   xnoremap <silent> <buffer> o    :<c-u>call <sid>open(1)<cr>
   xnoremap <silent> <buffer> O    :<c-u>call <sid>open(1, 1)<cr>
   nnoremap          <buffer> <expr> .  <sid>dot()
+  nnoremap          <buffer> <expr> ~  <sid>tilde()
   nnoremap <silent> <buffer> <expr> ]] <sid>move('')
   nnoremap <silent> <buffer> <expr> ][ <sid>move('')
   nnoremap <silent> <buffer> <expr> [[ <sid>move('b')
