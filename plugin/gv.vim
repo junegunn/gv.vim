@@ -190,11 +190,30 @@ function! s:maps()
   xnoremap <silent> <buffer> <expr> ][ <sid>move('')
   xnoremap <silent> <buffer> <expr> [[ <sid>move('b')
   xnoremap <silent> <buffer> <expr> [] <sid>move('b')
+  nnoremap <silent> <buffer>        [z :<c-u>call <sid>folds(0)<cr>
+  nnoremap <silent> <buffer>        ]z :<c-u>call <sid>folds(1)<cr>
 
   nmap              <buffer> <C-n> ]]o
   nmap              <buffer> <C-p> [[o
   xmap              <buffer> <C-n> ]]ogv
   xmap              <buffer> <C-p> [[ogv
+endfunction
+
+function! s:folds(down)
+  if len(tabpagebuflist()) == 1
+    normal o
+  endif
+  wincmd l
+  if a:down
+    if foldlevel('.') > 0 | normal! zczj
+    else                  | normal! zj
+    endif                 | normal! zo
+  else
+    if foldlevel('.') > 0 | normal! zczkzkzj
+    else                  | normal! zkzkzj
+    endif                 | normal! zo
+  endif
+  wincmd h
 endfunction
 
 function! s:setup(git_dir, git_origin)
