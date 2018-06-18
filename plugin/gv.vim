@@ -34,6 +34,12 @@ function! gv#sha(...)
   return matchstr(get(a:000, 0, getline('.')), s:begin.'\zs[a-f0-9]\+')
 endfunction
 
+function! gv#diff(...)
+  let l:list = deepcopy(a:000)
+  call insert(l:list, "diff", 0)
+  call s:open_direct('diff', call(fugitive#repo().git_command, l:list))
+endfunction
+
 function! s:move(flag)
   let [l, c] = searchpos(s:begin, a:flag)
   return l ? printf('%dG%d|', l, c) : ''
@@ -95,20 +101,27 @@ endfunction
 
 function! s:open(visual, ...)
   let [type, target] = s:type(a:visual)
+  if a:0 == 1 
+    return s:open_direct(type, target, a:1)
+  else
+    return s:open_direct(type, target)
+  endif          
+endfunction
 
-  if empty(type)
+function! s:open_direct(type, target, ...)
+  if empty(a:type)
     return s:shrug()
-  elseif type == 'link'
-    return s:browse(target)
+  elseif a:type == 'link'
+    return s:browse(a:target)
   endif
 
   call s:split(a:0)
-  if type == 'commit'
-    execute 'e' escape(target, ' ')
+  if a:type == 'commit'
+    execute 'e' escape(a:target, ' ')
     nnoremap <silent> <buffer> gb :Gbrowse<cr>
-  elseif type == 'diff'
+  elseif a:type == 'diff'
     call s:scratch()
-    call s:fill(target)
+    call s:fill(a:target)
     setf diff
   endif
   nnoremap <silent> <buffer> q :close<cr>
