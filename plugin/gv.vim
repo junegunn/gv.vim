@@ -251,6 +251,8 @@ function! s:list(fugitive_repo, log_opts)
   let git_log_cmd = FugitiveShellCommand(git_args, a:fugitive_repo)
 
   let repo_short_name = fnamemodify(substitute(a:fugitive_repo.dir(), '[\\/]\.git[\\/]\?$', '', ''), ':t')
+  let b:gv_opts = a:log_opts
+  let b:gv_repo_short_name = repo_short_name
   let bufname = repo_short_name.' '.join(a:log_opts)
   silent exe (bufexists(bufname) ? 'buffer' : 'file') fnameescape(bufname)
 
