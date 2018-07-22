@@ -1,0 +1,67 @@
+gv-vim.txt	gv-vim	Last change: April 29 2018
+
+GV-VIM                                                                 *gv-vim*
+==============================================================================
+
+A git commit browser.
+
+
+{gitv}{1} is nice. But I needed a faster, and possibly simpler alternative
+that I can use with a project with thousands of commits.
+
+                                           {1} https://github.com/gregsexton/gitv
+
+
+
+INSTALLATION                                              *gv-vim-installation*
+==============================================================================
+
+Requires fugitive.
+
+Using {vim-plug}{2}:
+>
+    Plug 'tpope/vim-fugitive'
+    Plug 'junegunn/gv.vim'
+<
+                                      {2} https://github.com/junegunn/vim-plug
+
+
+COMMANDS                                                      *gv-vim-commands*
+==============================================================================
+
+
+  `:GV` to open commit browser.
+      You can pass `git log` options to the command, e.g. `:GV -S foobar`
+
+  `:GV!` will only list commits that affected the current file
+  `:GV?` fills the location list with the revisions of the current file
+
+  `:GV` or `:GV?` can be used in visual mode to track the changes in the
+  selected lines.
+
+
+
+MAPPINGS                                                      *gv-vim-mappings*
+==============================================================================
+
+ --------------+---------------------------------------------------------
+ Mapping       | Description                              ~
+ --------------+---------------------------------------------------------
+ `o` or `<cr>`     | on a commit to display the content of it
+ `o` or `<cr>`     | on commits to display the diff in the range
+ `O`             | opens a new tab instead
+ `gb`            | for `:Gbrowse`
+ `]]` and `[[`     | to move between commits
+ `.`             | to start command-line with `:Git [CURSOR] SHA` à la fugitive
+ `~`             | to set GitGutter diff base to the commit
+ `q`             | to close
+ --------------+---------------------------------------------------------
+
+
+CUSTOMIZATION                                            *gv-vim-customization*
+==============================================================================
+
+`¯\_(ツ)_/¯`
+
+==============================================================================
+vim:tw=78:sw=2:ts=2:ft=help:norl:nowrap:
