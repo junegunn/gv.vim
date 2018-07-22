@@ -130,7 +130,8 @@ function! s:syntax()
   syn clear
   syn match gvInfo    /^[^0-9]*\zs[0-9-]\+\s\+[a-f0-9]\+ / contains=gvDate,gvSha nextgroup=gvMessage,gvMeta
   syn match gvDate    /\S\+ / contained
-  syn match gvSha     /[a-f0-9]\{6,}/ contained
+  syn match gvSha     /[a-f0-9]\{7}/ contained nextgroup=gvShaConceal
+  syn match gvShaConceal /[a-f0-9]\{8,}/ contained conceal
   syn match gvMessage /.* \ze(.\{-})$/ contained contains=gvTag,gvGitHub,gvJira nextgroup=gvAuthor
   syn match gvAuthor  /.*$/ contained
   syn match gvMeta    /([^)]\+) / contained contains=gvTag nextgroup=gvMessage
@@ -218,7 +219,7 @@ function! s:git_dir()
 endfunction
 
 function! s:scratch()
-  setlocal buftype=nofile bufhidden=wipe noswapfile
+  setlocal buftype=nofile bufhidden=wipe noswapfile concealcursor=n conceallevel=2
 endfunction
 
 function! s:fill(cmd)
@@ -251,7 +252,7 @@ function! s:log_opts(fugitive_repo, bang, visual, line1, line2)
 endfunction
 
 function! s:list(fugitive_repo, log_opts)
-  let default_opts = ['--color=never', '--date=short', '--format=%cd %h%d %s (%an)']
+  let default_opts = ['--color=never', '--date=short', '--format=%cd %H%d %s (%an)']
   let git_args = ['log'] + default_opts + a:log_opts
   let git_log_cmd = call(a:fugitive_repo.git_command, git_args, a:fugitive_repo)
 
