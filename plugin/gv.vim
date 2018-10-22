@@ -76,7 +76,7 @@ function! s:type(visual)
 
   let sha = gv#sha()
   if !empty(sha)
-    return ['commit', FugitiveGenerate(sha, b:git_dir)]
+    return ['commit', FugitiveFind(sha, b:git_dir)]
   endif
   return [0, 0]
 endfunction
