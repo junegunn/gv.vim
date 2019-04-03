@@ -87,6 +87,8 @@ function! s:split(tab)
   elseif getwinvar(winnr('$'), 'gv')
     $wincmd w
     enew
+  elseif exists('g:gv_horizontal')
+    botright new
   else
     vertical botright new
   endif
