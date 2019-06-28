@@ -245,7 +245,7 @@ function! s:log_opts(fugitive_repo, bang, visual, line1, line2)
   if a:visual || a:bang
     let current = expand('%')
     call s:check_buffer(a:fugitive_repo, current)
-    return a:visual ? [printf('-L%d,%d:%s', a:line1, a:line2, current)] : ['--follow', current]
+    return a:visual ? [printf('-L%d,%d:%s', a:line1, a:line2, current)] : ['--follow', '--', current]
   endif
   return ['--graph']
 endfunction
