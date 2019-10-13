@@ -42,7 +42,7 @@ selected lines.
 - `gb` for `:Gbrowse`
 - `]]` and `[[` to move between commits
 - `.` to start command-line with `:Git [CURSOR] SHA` à la fugitive
-- `q` to close
+- `q` or `gq` to close
 
 Customization
 -------------
