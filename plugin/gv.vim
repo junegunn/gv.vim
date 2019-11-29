@@ -211,13 +211,6 @@ function! s:setup(git_dir, git_origin)
   let b:git_dir = a:git_dir
 endfunction
 
-function! s:git_dir()
-  if empty(get(b:, 'git_dir', ''))
-    return fugitive#extract_git_dir(expand('%:p'))
-  endif
-  return b:git_dir
-endfunction
-
 function! s:scratch()
   setlocal buftype=nofile bufhidden=wipe noswapfile
 endfunction
@@ -328,7 +321,7 @@ function! s:gv(bang, visual, line1, line2, args) abort
     return s:warn('fugitive not found')
   endif
 
-  let git_dir = s:git_dir()
+  let git_dir = FugitiveGitDir()
   if empty(git_dir)
     return s:warn('not in git repo')
   endif
