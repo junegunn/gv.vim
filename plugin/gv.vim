@@ -34,6 +34,21 @@ function! gv#sha(...)
   return matchstr(get(a:000, 0, getline('.')), s:begin.'\zs[a-f0-9]\+')
 endfunction
 
+function! gv#stashIndex(...)
+  let sha = gv#sha()
+  if empty(sha)
+    return s:shrug()
+  endif
+  let git_dir = FugitiveGitDir()
+  let fugitive_repo = fugitive#repo(git_dir)
+  " get list of stash in sha
+  let stash_sha_cmd = call(fugitive_repo.git_command, ['reflog']+['show']+['--format=%h']+['stash'], fugitive_repo)
+  let stash_sha = system(stash_sha_cmd)
+  let shas = split(stash_sha, "[^a-zA-Z0-9]") "split whatever non alphanum
+  " retrieve the index of the current cursor's sha
+  return index(shas,sha)
+endfunction
+
 function! s:move(flag)
   let [l, c] = searchpos(s:begin, a:flag)
   return l ? printf('%dG%d|', l, c) : ''
@@ -120,6 +135,18 @@ function! s:open(visual, ...)
   echo
 endfunction
 
+function! s:stash(mode)
+  if a:mode == 'list'
+    execute 'G stash list'
+  elseif a:mode == 'drop'
+    execute 'G stash drop '.gv#stashIndex()
+  elseif a:mode == 'append'
+    execute 'G stash'
+  elseif a:mode == 'pop'
+    execute 'G stash pop'
+  endif
+endfunction
+
 function! s:dot()
   let sha = gv#sha()
   return empty(sha) ? '' : ':Git  '.sha."\<s-left>\<left>"
@@ -183,6 +210,10 @@ function! s:maps()
   xnoremap <silent> <buffer> <expr> ][ <sid>move('')
   xnoremap <silent> <buffer> <expr> [[ <sid>move('b')
   xnoremap <silent> <buffer> <expr> [] <sid>move('b')
+  nnoremap <buffer> cl :call <sid>stash('list')<cr>
+  nnoremap <buffer> cd :call <sid>stash('drop')<cr>
+  nnoremap <buffer> czz :call <sid>stash('append')<cr>
+  nnoremap <buffer> czP :call <sid>stash('pop')<cr>
 
   nmap              <buffer> <C-n> ]]o
   nmap              <buffer> <C-p> [[o
