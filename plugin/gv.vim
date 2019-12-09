@@ -103,11 +103,11 @@ function! s:open(visual, ...)
   endif
 
   call s:split(a:0)
+  call s:scratch()
   if type == 'commit'
     execute 'e' escape(target, ' ')
     nnoremap <silent> <buffer> gb :Gbrowse<cr>
   elseif type == 'diff'
-    call s:scratch()
     call s:fill(target)
     setf diff
   endif
