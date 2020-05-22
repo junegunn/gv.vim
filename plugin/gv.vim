@@ -212,7 +212,7 @@ function! s:setup(git_dir, git_origin)
 endfunction
 
 function! s:scratch()
-  setlocal buftype=nofile bufhidden=wipe noswapfile
+  setlocal buftype=nofile bufhidden=wipe noswapfile nomodeline
 endfunction
 
 function! s:fill(cmd)
