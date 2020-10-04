@@ -231,13 +231,6 @@ function! s:setup(git_dir, git_origin)
   let b:git_dir = a:git_dir
 endfunction
 
-function! s:git_dir()
-  if empty(get(b:, 'git_dir', ''))
-    return fugitive#extract_git_dir(expand('%:p'))
-  endif
-  return b:git_dir
-endfunction
-
 function! s:disableDimInactive() 
   if exists(':DimInactiveBufferOff')
     DimInactiveBufferOff
@@ -245,7 +238,7 @@ function! s:disableDimInactive()
 endfunction
 
 function! s:scratch()
-  setlocal buftype=nofile bufhidden=wipe noswapfile
+  setlocal buftype=nofile bufhidden=wipe noswapfile nomodeline
 endfunction
 
 function! s:fill(cmd)
@@ -272,7 +265,7 @@ function! s:log_opts(fugitive_repo, bang, visual, line1, line2)
   if a:visual || a:bang
     let current = expand('%')
     call s:check_buffer(a:fugitive_repo, current)
-    return a:visual ? [printf('-L%d,%d:%s', a:line1, a:line2, current)] : ['--follow', current]
+    return a:visual ? [printf('-L%d,%d:%s', a:line1, a:line2, current)] : ['--follow', '--', current]
   endif
   return ['--graph']
 endfunction
@@ -286,7 +279,7 @@ function! s:list(fugitive_repo, log_opts)
   let bufname = repo_short_name.' '.join(a:log_opts)
   silent exe (bufexists(bufname) ? 'buffer' : 'file') fnameescape(bufname)
 
-  call s:fill(git_log_cmd, a:root)
+  call s:fill(git_log_cmd)
   setlocal nowrap tabstop=8 cursorline iskeyword+=#
 
   if !exists(':Gbrowse')
@@ -377,7 +370,7 @@ function! s:gv(bang, visual, line1, line2, args) abort
     else
       let log_opts = extend(gv#shellwords(a:args), s:log_opts(fugitive_repo, a:bang, a:visual, a:line1, a:line2))
       call s:setup(git_dir, fugitive_repo.config('remote.origin.url'))
-      call s:list(fugitive_repo, log_opts, root)
+      call s:list(fugitive_repo, log_opts)
       call FugitiveDetect(@#)
     endif
   catch
