@@ -27,7 +27,7 @@ Usage
 ### Commands
 
 - `:GV` to open commit browser
-    - You can pass `git log` options to the command, e.g. `:GV -S foobar`.
+    - You can pass `git log` options to the command, e.g. `:GV -S foobar -- plugins`.
 - `:GV!` will only list commits that affected the current file
 - `:GV?` fills the location list with the revisions of the current file
 
