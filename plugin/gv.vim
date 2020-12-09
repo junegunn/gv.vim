@@ -106,6 +106,7 @@ function! s:open(visual, ...)
   call s:scratch()
   if type == 'commit'
     execute 'e' escape(target, ' ')
+    call s:disableDimInactive()
     nnoremap <silent> <buffer> gb :Gbrowse<cr>
   elseif type == 'diff'
     call s:fill(target)
@@ -164,11 +165,30 @@ function! s:syntax()
   hi def link diffLine    Statement
 endfunction
 
+function! s:gdiff()
+  let sha = gv#sha()
+  if len(sha)
+      tabnew
+      execute 'e '.g:currBufferForGv
+      execute 'Gedit '.sha
+      call search('^diff --git.*\sb/'.g:currBufferForGv.'\s*$')
+      normal o
+      " execute 'Gdiff '.sha
+      wincmd j
+      q
+      nmap q :wincmd o<cr>:q<cr>gt
+      wincmd l
+      nmap q :wincmd o<cr>:q<cr>gt
+      wincmd h
+  endif
+endfunction
 function! s:maps()
   nnoremap <silent> <buffer> q    :$wincmd w <bar> close<cr>
   nnoremap <silent> <buffer> <nowait> gq :$wincmd w <bar> close<cr>
   nnoremap <silent> <buffer> gb   :call <sid>gbrowse()<cr>
   nnoremap <silent> <buffer> <cr> :call <sid>open(0)<cr>
+  nnoremap <silent> <buffer> gd   :call <sid>gdiff()<cr>
+  nnoremap <silent> <buffer> D    :call <sid>gdiff()<cr>
   nnoremap <silent> <buffer> o    :call <sid>open(0)<cr>
   nnoremap <silent> <buffer> O    :call <sid>open(0, 1)<cr>
   xnoremap <silent> <buffer> <cr> :<c-u>call <sid>open(1)<cr>
@@ -209,6 +229,12 @@ function! s:setup(git_dir, git_origin)
     let b:git_origin = printf('%s%s/%s', scheme, origin[2], origin[3])
   endif
   let b:git_dir = a:git_dir
+endfunction
+
+function! s:disableDimInactive() 
+  if exists(':DimInactiveBufferOff')
+    DimInactiveBufferOff
+  endif
 endfunction
 
 function! s:scratch()
@@ -327,6 +353,7 @@ function! s:gld() range
 endfunction
 
 function! s:gv(bang, visual, line1, line2, args) abort
+  let g:currBufferForGv = expand('%')
   if !exists('g:loaded_fugitive')
     return s:warn('fugitive not found')
   endif
