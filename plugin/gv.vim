@@ -171,7 +171,7 @@ function! s:gdiff()
       tabnew
       execute 'e '.g:currBufferForGv
       execute 'Gedit '.sha
-      call search('^diff --git.*\sb/'.g:currBufferForGv.'\s*$')
+      call search('^diff --git.*\sb/\S*'.g:currBufferForGv.'\s*$')
       normal o
       " execute 'Gdiff '.sha
       wincmd j
