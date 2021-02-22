@@ -190,8 +190,13 @@ function! s:maps()
   xmap              <buffer> <C-p> [[ogv
 endfunction
 
-function! s:setup(git_dir, git_origin)
-  call s:tabnew()
+function! s:setup(bufname, git_dir, git_origin)
+  let winid = s:find_winid(a:bufname)
+  if winid != -1
+    call win_gotoid(winid)
+  else
+    call s:tabnew()
+  endif
   call s:scratch()
 
   if exists('g:fugitive_github_domains')
@@ -211,14 +216,29 @@ function! s:setup(git_dir, git_origin)
   let b:git_dir = a:git_dir
 endfunction
 
+function! s:find_winid(bufname)
+  let bufid = buffer_number(a:bufname)
+  let winid = -1
+  if bufid != -1
+    let winidlist = win_findbuf(bufid)
+    if !empty(winidlist)
+      let winid = winidlist[0]
+    endif
+  endif
+  return winid
+endfunction
+
 function! s:scratch()
   setlocal buftype=nofile bufhidden=wipe noswapfile nomodeline
 endfunction
 
 function! s:fill(cmd)
   setlocal modifiable
+  let cursor_line = line('.')
+  silent normal! gg"_dG
   silent execute 'read' escape('!'.a:cmd, '%')
   normal! gg"_dd
+  execute cursor_line
   setlocal nomodifiable
 endfunction
 
@@ -244,14 +264,12 @@ function! s:log_opts(fugitive_repo, bang, visual, line1, line2)
   return [['--graph'], []]
 endfunction
 
-function! s:list(fugitive_repo, log_opts)
+function! s:list(bufname, fugitive_repo, log_opts)
   let default_opts = ['--color=never', '--date=short', '--format=%cd %h%d %s (%an)']
   let git_args = ['log'] + default_opts + a:log_opts
   let git_log_cmd = call(a:fugitive_repo.git_command, git_args, a:fugitive_repo)
 
-  let repo_short_name = fnamemodify(a:fugitive_repo.tree(), ':t')
-  let bufname = repo_short_name.' '.join(a:log_opts)
-  silent exe (bufexists(bufname) ? 'buffer' : 'file') fnameescape(bufname)
+  silent exe (bufexists(a:bufname) ? 'buffer' : 'file') fnameescape(a:bufname)
 
   call s:fill(git_log_cmd)
   setlocal nowrap tabstop=8 cursorline iskeyword+=#
@@ -354,8 +372,11 @@ function! s:gv(bang, visual, line1, line2, args) abort
       let [opts1, paths1] = s:log_opts(fugitive_repo, a:bang, a:visual, a:line1, a:line2)
       let [opts2, paths2] = s:split_pathspec(gv#shellwords(a:args))
       let log_opts = opts1 + opts2 + paths1 + paths2
-      call s:setup(git_dir, fugitive_repo.config('remote.origin.url'))
-      call s:list(fugitive_repo, log_opts)
+      let repo_short_name = fnamemodify(fugitive_repo.tree(), ':t')
+      let bufname = repo_short_name.' '.join(log_opts)
+
+      call s:setup(bufname, git_dir, fugitive_repo.config('remote.origin.url'))
+      call s:list(bufname, fugitive_repo, log_opts)
       call FugitiveDetect(@#)
     endif
   catch
