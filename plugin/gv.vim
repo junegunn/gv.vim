@@ -218,14 +218,14 @@ endfunction
 
 function! s:find_winid(bufname)
   let bufid = buffer_number(a:bufname)
-  let winid = -1
-  if bufid != -1
-    let winidlist = win_findbuf(bufid)
-    if !empty(winidlist)
-      let winid = winidlist[0]
-    endif
+  if bufid == -1
+    return -1
   endif
-  return winid
+  let winidlist = win_findbuf(bufid)
+  if empty(winidlist)
+    return -1
+  endif
+  return winidlist[0]
 endfunction
 
 function! s:scratch()
