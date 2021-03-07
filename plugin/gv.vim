@@ -234,11 +234,11 @@ endfunction
 
 function! s:fill(cmd)
   setlocal modifiable
-  let cursor_line = line('.')
+  let win_state = winsaveview()
   silent normal! gg"_dG
   silent execute 'read' escape('!'.a:cmd, '%')
   normal! gg"_dd
-  execute cursor_line
+  call winrestview(win_state)
   setlocal nomodifiable
 endfunction
 
