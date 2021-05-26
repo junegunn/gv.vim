@@ -52,7 +52,7 @@ function! s:gbrowse()
   if empty(sha)
     return s:shrug()
   endif
-  execute 'Gbrowse' sha
+  execute 'GBrowse' sha
 endfunction
 
 function! s:type(visual)
@@ -106,7 +106,7 @@ function! s:open(visual, ...)
   call s:scratch()
   if type == 'commit'
     execute 'e' escape(target, ' ')
-    nnoremap <silent> <buffer> gb :Gbrowse<cr>
+    nnoremap <silent> <buffer> gb :GBrowse<cr>
   elseif type == 'diff'
     call s:fill(target)
     setf diff
@@ -256,13 +256,13 @@ function! s:list(fugitive_repo, log_opts)
   call s:fill(git_log_cmd)
   setlocal nowrap tabstop=8 cursorline iskeyword+=#
 
-  if !exists(':Gbrowse')
+  if !exists(':GBrowse')
     doautocmd <nomodeline> User Fugitive
   endif
   call s:maps()
   call s:syntax()
   redraw
-  echo 'o: open split / O: open tab / gb: Gbrowse / q: quit'
+  echo 'o: open split / O: open tab / gb: GBrowse / q: quit'
 endfunction
 
 function! s:trim(arg)
