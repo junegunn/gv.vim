@@ -128,7 +128,17 @@ endfunction
 function! s:syntax()
   setf GV
   syn clear
-  syn match gvInfo    /^[^0-9]*\zs[0-9-]\+\s\+[a-f0-9]\+ / contains=gvDate,gvSha nextgroup=gvMessage,gvMeta
+  syn match  gitvGraphEdge9 /_\?\(|\|-\(-\|\.\)\|\/|\?\|\\\|\*\|+\|=\)\s\?/ nextgroup=gitvGraphEdge0,gvInfo skipwhite
+  syn match  gitvGraphEdge8 /_\?\(|\|-\(-\|\.\)\|\/|\?\|\\\|\*\|+\|=\)\s\?/ nextgroup=gitvGraphEdge9,gvInfo skipwhite
+  syn match  gitvGraphEdge7 /_\?\(|\|-\(-\|\.\)\|\/|\?\|\\\|\*\|+\|=\)\s\?/ nextgroup=gitvGraphEdge8,gvInfo skipwhite
+  syn match  gitvGraphEdge6 /_\?\(|\|-\(-\|\.\)\|\/|\?\|\\\|\*\|+\|=\)\s\?/ nextgroup=gitvGraphEdge7,gvInfo skipwhite
+  syn match  gitvGraphEdge5 /_\?\(|\|-\(-\|\.\)\|\/|\?\|\\\|\*\|+\|=\)\s\?/ nextgroup=gitvGraphEdge6,gvInfo skipwhite
+  syn match  gitvGraphEdge4 /_\?\(|\|-\(-\|\.\)\|\/|\?\|\\\|\*\|+\|=\)\s\?/ nextgroup=gitvGraphEdge5,gvInfo skipwhite
+  syn match  gitvGraphEdge3 /_\?\(|\|-\(-\|\.\)\|\/|\?\|\\\|\*\|+\|=\)\s\?/ nextgroup=gitvGraphEdge4,gvInfo skipwhite
+  syn match  gitvGraphEdge2 /_\?\(|\|-\(-\|\.\)\|\/|\?\|\\\|\*\|+\|=\)\s\?/ nextgroup=gitvGraphEdge3,gvInfo skipwhite
+  syn match  gitvGraphEdge1 /_\?\(|\|-\(-\|\.\)\|\/|\?\|\\\|\*\|+\|=\)\s\?/ nextgroup=gitvGraphEdge2,gvInfo skipwhite
+  syn match  gitvGraphEdge0 /_\?\(|\|-\(-\|\.\)\|\/|\?\|\\\|\*\|+\|=\)\s\?/ nextgroup=gitvGraphEdge1,gvInfo skipwhite
+  syn match gvInfo    /[^0-9]*\zs[0-9-]\+\s\+[a-f0-9]\+ / contains=gvDate,gvSha nextgroup=gvMessage,gvMeta
   syn match gvDate    /\S\+ / contained
   syn match gvSha     /[a-f0-9]\{6,}/ contained
   syn match gvMessage /.* \ze(.\{-})$/ contained contains=gvTag,gvGitHub,gvJira nextgroup=gvAuthor
@@ -162,6 +172,29 @@ function! s:syntax()
   hi def link diffRemoved Special
   hi def link diffFile    Type
   hi def link diffLine    Statement
+
+  if &background == "dark"
+    highlight default gitvGraphEdge1 ctermfg=magenta     guifg=green1
+    highlight default gitvGraphEdge2 ctermfg=green       guifg=yellow1
+    highlight default gitvGraphEdge3 ctermfg=yellow      guifg=orange1
+    highlight default gitvGraphEdge4 ctermfg=cyan        guifg=greenyellow
+    highlight default gitvGraphEdge5 ctermfg=red         guifg=springgreen1
+    highlight default gitvGraphEdge6 ctermfg=yellow      guifg=cyan1
+    highlight default gitvGraphEdge7 ctermfg=green       guifg=slateblue1
+    highlight default gitvGraphEdge8 ctermfg=cyan        guifg=magenta1
+    highlight default gitvGraphEdge9 ctermfg=magenta     guifg=purple1
+  else
+    highlight default gitvGraphEdge1 ctermfg=darkyellow  guifg=orangered3
+    highlight default gitvGraphEdge2 ctermfg=darkgreen   guifg=orange2
+    highlight default gitvGraphEdge3 ctermfg=blue        guifg=yellow3
+    highlight default gitvGraphEdge4 ctermfg=darkmagenta guifg=olivedrab4
+    highlight default gitvGraphEdge5 ctermfg=red         guifg=green4
+    highlight default gitvGraphEdge6 ctermfg=darkyellow  guifg=paleturquoise3
+    highlight default gitvGraphEdge7 ctermfg=darkgreen   guifg=deepskyblue4
+    highlight default gitvGraphEdge8 ctermfg=blue        guifg=darkslateblue
+    highlight default gitvGraphEdge9 ctermfg=darkmagenta guifg=darkviolet
+  endif
+
 endfunction
 
 function! s:maps()
