@@ -246,13 +246,13 @@ function! s:log_opts(fugitive_repo, bang, visual, line1, line2)
 endfunction
 
 function! s:list(fugitive_repo, log_opts)
-  let default_opts = ['--color=never', '--date=short', '--format=%cd %h%d %s (%an)']
-  let git_args = ['log'] + default_opts + a:log_opts
-  let b:git_log_cmd = call(a:fugitive_repo.git_command, git_args, a:fugitive_repo)
-
   let repo_short_name = fnamemodify(substitute(a:fugitive_repo.dir(), '[\\/]\.git[\\/]\?$', '', ''), ':t')
   let bufname = repo_short_name.' '.join(a:log_opts)
   silent exe (bufexists(bufname) ? 'buffer' : 'file') fnameescape(bufname)
+
+  let default_opts = ['--color=never', '--date=short', '--format=%cd %h%d %s (%an)']
+  let git_args = ['log'] + default_opts + a:log_opts
+  let b:git_log_cmd = call(a:fugitive_repo.git_command, git_args, a:fugitive_repo)
 
   call s:fill(b:git_log_cmd)
   setlocal nowrap tabstop=8 cursorline iskeyword+=#
