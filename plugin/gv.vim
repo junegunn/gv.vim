@@ -167,6 +167,7 @@ endfunction
 function! s:maps()
   nnoremap <silent> <buffer> q    :$wincmd w <bar> close<cr>
   nnoremap <silent> <buffer> <nowait> gq :$wincmd w <bar> close<cr>
+  nnoremap <silent> <buffer> r    :call <sid>refresh()<cr>
   nnoremap <silent> <buffer> gb   :call <sid>gbrowse()<cr>
   nnoremap <silent> <buffer> <cr> :call <sid>open(0)<cr>
   nnoremap <silent> <buffer> o    :call <sid>open(0)<cr>
@@ -247,13 +248,13 @@ endfunction
 function! s:list(fugitive_repo, log_opts)
   let default_opts = ['--color=never', '--date=short', '--format=%cd %h%d %s (%an)']
   let git_args = ['log'] + default_opts + a:log_opts
-  let git_log_cmd = call(a:fugitive_repo.git_command, git_args, a:fugitive_repo)
+  let b:git_log_cmd = call(a:fugitive_repo.git_command, git_args, a:fugitive_repo)
 
   let repo_short_name = fnamemodify(substitute(a:fugitive_repo.dir(), '[\\/]\.git[\\/]\?$', '', ''), ':t')
   let bufname = repo_short_name.' '.join(a:log_opts)
   silent exe (bufexists(bufname) ? 'buffer' : 'file') fnameescape(bufname)
 
-  call s:fill(git_log_cmd)
+  call s:fill(b:git_log_cmd)
   setlocal nowrap tabstop=8 cursorline iskeyword+=#
 
   if !exists(':GBrowse')
@@ -262,7 +263,15 @@ function! s:list(fugitive_repo, log_opts)
   call s:maps()
   call s:syntax()
   redraw
-  echo 'o: open split / O: open tab / gb: GBrowse / q: quit'
+  echo 'o: open split / O: open tab / gb: GBrowse / r: refresh / q: quit'
+endfunction
+
+function! s:refresh()
+  " refresh current GV buffer
+  setlocal modifiable
+  normal! gg"_dG
+  setlocal nomodifiable
+  call s:fill(b:git_log_cmd)
 endfunction
 
 function! s:trim(arg)
