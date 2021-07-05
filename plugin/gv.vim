@@ -120,6 +120,43 @@ function! s:open(visual, ...)
   echo
 endfunction
 
+" get the sha of last stashed item, will be used by 's:resetBranch'
+function! gv#lastStash()
+  let git_dir = FugitiveGitDir()
+  let fugitive_repo = fugitive#repo(git_dir)
+  " check if user has stash
+  let stash_list_cmd = call(fugitive_repo.git_command, ['stash']+['list'], fugitive_repo)
+  let stashlist = system(stash_list_cmd)
+  if stashlist == ""
+    return ""
+  else
+    let stash_list_sha_cmd = call(fugitive_repo.git_command, ['reflog']+['show']+['--format=%h']+['stash'], fugitive_repo)
+    let stash_list_sha = system(stash_list_sha_cmd)
+    return split(stash_list_sha, "\r")[0]
+  endif
+endfunction
+
+" Reset current branch to a commit highlighted by the cursor 
+function! s:resetBranch(mode)
+  let sha = gv#sha()
+  if empty(sha)
+    return s:shrug()
+  endif
+  let option = a:mode == 'hard' ? "--hard" : ""
+  let prevtopstash = gv#lastStash()
+  " Stash existing changes before resetting happen, it will be
+  " automatically popped below
+  execute 'G stash'
+  " Reset the commit
+  execute 'G reset '.option.' '.sha
+  " only pop the stash that we have just created automatically (don't pop
+  " user's stash)
+  let currenttopstash = gv#lastStash()
+  if prevtopstash != currenttopstash
+    execute 'G stash pop'
+  endif
+endfunction
+
 function! s:dot()
   let sha = gv#sha()
   return empty(sha) ? '' : ':Git  '.sha."\<s-left>\<left>"
@@ -183,6 +220,9 @@ function! s:maps()
   xnoremap <silent> <buffer> <expr> ][ <sid>move('')
   xnoremap <silent> <buffer> <expr> [[ <sid>move('b')
   xnoremap <silent> <buffer> <expr> [] <sid>move('b')
+  " COM: custom remap
+  nnoremap <buffer> rh :call <sid>resetBranch('hard')<cr>
+  nnoremap <buffer> rs :call <sid>resetBranch('soft')<cr>
 
   nmap              <buffer> <C-n> ]]o
   nmap              <buffer> <C-p> [[o
