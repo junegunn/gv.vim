@@ -137,6 +137,7 @@ function! s:syntax()
   " syn match gvTag     /(tag:[^)]\+)/ contained
   " syn match gvTag     /\((\|, \)tag: .\{-1,}\(, \|)\)/ contained
   syn match gvTag     /\((\|, \)\@<=tag: .\{-1,}\(, \|)\)\@=/ contained
+  syn match gvTag     /(tag: [^ )]\+)/ contained
   syn match gvGitHub  /\<#[0-9]\+\>/ contained
   syn match gvJira    /\<[A-Z]\+-[0-9]\+\>/ contained
   hi def link gvDate   Number
