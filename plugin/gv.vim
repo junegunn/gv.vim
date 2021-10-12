@@ -125,6 +125,11 @@ function! s:dot()
   return empty(sha) ? '' : ':Git  '.sha."\<s-left>\<left>"
 endfunction
 
+function! s:checkout()
+  let sha = gv#sha()
+  return empty(sha) ? '' : ':Git  checkout '.sha."\<s-left>\<left>"
+endfunction
+
 function! s:syntax()
   setf GV
   syn clear
@@ -175,6 +180,7 @@ function! s:maps()
   xnoremap <silent> <buffer> o    :<c-u>call <sid>open(1)<cr>
   xnoremap <silent> <buffer> O    :<c-u>call <sid>open(1, 1)<cr>
   nnoremap          <buffer> <expr> .  <sid>dot()
+  nnoremap          <buffer> <expr> c  <sid>checkout()
   nnoremap <silent> <buffer> <expr> ]] <sid>move('')
   nnoremap <silent> <buffer> <expr> ][ <sid>move('')
   nnoremap <silent> <buffer> <expr> [[ <sid>move('b')
