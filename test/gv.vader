@@ -11,6 +11,8 @@ Execute (Test gv#shellwords):
   AssertEqual ['foo " bar'],        gv#shellwords('"foo \" bar"')
   AssertEqual ['foo " bar', 'baz'], gv#shellwords("'foo \" bar' baz")
   AssertEqual ['foo', 'bar baz'],   gv#shellwords("'foo' 'bar baz'")
+  AssertEqual ['--'],               gv#shellwords('--')
+  AssertEqual ['--'],               gv#shellwords('"--"')
 
 Execute (Test gv#sha):
   AssertEqual '33d2a88',    gv#sha('* 2016-06-18 33d2a88 Let fugitive add buffer-local Git command to GV buffer (Junegunn Choi)')
