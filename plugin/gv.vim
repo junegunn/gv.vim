@@ -199,9 +199,8 @@ endfunction
 
 function! s:log_opts(fugitive_repo, bang, visual, line1, line2)
   if a:visual || a:bang
-    let current = expand('%')
-    call s:check_buffer(a:fugitive_repo, current)
-    return a:visual ? [[printf('-L%d,%d:%s', a:line1, a:line2, current)], []] : [['--follow'], ['--', current]]
+    call s:check_buffer(a:fugitive_repo, b:current_path)
+    return a:visual ? [[printf('-L%d,%d:%s', a:line1, a:line2, b:current_path)], []] : [['--follow'], ['--', b:current_path]]
   endif
   return [['--graph'], []]
 endfunction
@@ -279,6 +278,14 @@ function! s:gl(buf, visual)
   let w:quickfix_title = 'o: open / o (in visual): diff / O: open (tab) / q: quit'
 endfunction
 
+function! s:chdir(path)
+  if exists('*chdir')
+    call chdir(a:path)
+  else
+    execute 'lcd '.a:path
+  endif
+endfunction
+
 function! s:gld() range
   let [to, from] = map([a:firstline, a:lastline], 'split(getline(v:val), "|")[0]')
   execute (tabpagenr()-1).'tabedit' escape(to, ' ')
@@ -299,18 +306,18 @@ function! s:gv(bang, visual, line1, line2, args) abort
   endif
 
   let fugitive_repo = fugitive#repo(git_dir)
-  let cd = exists('*haslocaldir') && haslocaldir() ? 'lcd' : 'cd'
-  let cwd = getcwd()
   let root = fugitive_repo.tree()
+
+  call s:chdir(root)
+  let b:current_path = expand('%')
+  call s:chdir('-')
+
   try
-    if cwd !=# root
-      execute cd escape(root, ' ')
-    endif
     if a:args =~ '?$'
       if len(a:args) > 1
         return s:warn('invalid arguments')
       endif
-      call s:check_buffer(fugitive_repo, expand('%'))
+      call s:check_buffer(fugitive_repo, b:current_path)
       call s:gl(bufnr(''), a:visual)
     else
       let [opts1, paths1] = s:log_opts(fugitive_repo, a:bang, a:visual, a:line1, a:line2)
@@ -320,12 +327,9 @@ function! s:gv(bang, visual, line1, line2, args) abort
       call s:list(fugitive_repo, log_opts)
       call FugitiveDetect(@#)
     endif
+    call s:chdir(root)
   catch
     return s:warn(v:exception)
-  finally
-    if getcwd() !=# cwd
-      cd -
-    endif
   endtry
 endfunction
 
