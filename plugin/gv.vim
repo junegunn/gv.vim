@@ -211,7 +211,7 @@ function! s:list(fugitive_repo, log_opts)
   let git_args = ['log'] + default_opts + a:log_opts
   let git_log_cmd = FugitiveShellCommand(git_args, a:fugitive_repo)
 
-  let repo_short_name = fnamemodify(substitute(a:fugitive_repo.dir(), '[\\/]\.git[\\/]\?$', '', ''), ':t')
+  let repo_short_name = fnamemodify(substitute(a:fugitive_repo, '[\\/]\.git[\\/]\?$', '', ''), ':t')
   let bufname = repo_short_name.' '.join(a:log_opts)
   silent exe (bufexists(bufname) ? 'buffer' : 'file') fnameescape(bufname)
 
@@ -298,10 +298,10 @@ function! s:gv(bang, visual, line1, line2, args) abort
     return s:warn('not in git repo')
   endif
 
-  let fugitive_repo = fugitive#repo(git_dir)
+  let fugitive_repo = git_dir
   let cd = exists('*haslocaldir') && haslocaldir() ? 'lcd' : 'cd'
   let cwd = getcwd()
-  let root = fugitive_repo.tree()
+  let root = FugitiveFind(':/')
   try
     if cwd !=# root
       execute cd escape(root, ' ')
@@ -316,7 +316,7 @@ function! s:gv(bang, visual, line1, line2, args) abort
       let [opts1, paths1] = s:log_opts(fugitive_repo, a:bang, a:visual, a:line1, a:line2)
       let [opts2, paths2] = s:split_pathspec(gv#shellwords(a:args))
       let log_opts = opts1 + opts2 + paths1 + paths2
-      call s:setup(git_dir, fugitive_repo.config('remote.origin.url'))
+      call s:setup(git_dir, FugitiveConfigGet('remote.origin.url'))
       call s:list(fugitive_repo, log_opts)
       call FugitiveDetect(@#)
     endif
