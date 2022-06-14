@@ -76,7 +76,7 @@ function! s:type(visual)
 
   let sha = gv#sha()
   if !empty(sha)
-    return ['commit', FugitiveFind(sha, b:git_dir)]
+    return ['commit', FugitiveFind(sha)]
   endif
   return [0, 0]
 endfunction
@@ -151,7 +151,7 @@ function! s:maps()
   xmap              <buffer> <C-p> [[ogv
 endfunction
 
-function! s:setup(git_dir, git_origin)
+function! s:setup(git_origin)
   call s:tabnew()
   call s:scratch()
 
@@ -169,7 +169,6 @@ function! s:setup(git_dir, git_origin)
     let scheme = origin[1] =~ '^http' ? origin[1] : 'https://'
     let b:git_origin = printf('%s%s/%s', scheme, origin[2], origin[3])
   endif
-  let b:git_dir = a:git_dir
 endfunction
 
 function! s:scratch()
@@ -184,34 +183,34 @@ function! s:fill(cmd)
   setlocal nomodifiable
 endfunction
 
-function! s:tracked(fugitive_repo, file)
+function! s:tracked(file)
   call system(FugitiveShellCommand(['ls-files', '--error-unmatch', a:file]))
   return !v:shell_error
 endfunction
 
-function! s:check_buffer(fugitive_repo, current)
+function! s:check_buffer(current)
   if empty(a:current)
     throw 'untracked buffer'
-  elseif !s:tracked(a:fugitive_repo, a:current)
+  elseif !s:tracked(a:current)
     throw a:current.' is untracked'
   endif
 endfunction
 
-function! s:log_opts(fugitive_repo, bang, visual, line1, line2)
+function! s:log_opts(bang, visual, line1, line2)
   if a:visual || a:bang
     let current = expand('%')
-    call s:check_buffer(a:fugitive_repo, current)
+    call s:check_buffer(current)
     return a:visual ? [[printf('-L%d,%d:%s', a:line1, a:line2, current)], []] : [['--follow'], ['--', current]]
   endif
   return [['--graph'], []]
 endfunction
 
-function! s:list(fugitive_repo, log_opts)
+function! s:list(log_opts)
   let default_opts = ['--color=never', '--date=short', '--format=%cd %h%d %s (%an)']
   let git_args = ['log'] + default_opts + a:log_opts
-  let git_log_cmd = FugitiveShellCommand(git_args, a:fugitive_repo)
+  let git_log_cmd = FugitiveShellCommand(git_args)
 
-  let repo_short_name = fnamemodify(substitute(a:fugitive_repo.dir(), '[\\/]\.git[\\/]\?$', '', ''), ':t')
+  let repo_short_name = fnamemodify(substitute(FugitiveGitDir(), '[\\/]\.git[\\/]\?$', '', ''), ':t')
   let bufname = repo_short_name.' '.join(a:log_opts)
   silent exe (bufexists(bufname) ? 'buffer' : 'file') fnameescape(bufname)
 
@@ -293,15 +292,13 @@ function! s:gv(bang, visual, line1, line2, args) abort
     return s:warn('fugitive not found')
   endif
 
-  let git_dir = FugitiveGitDir()
-  if empty(git_dir)
+  if empty(FugitiveGitDir())
     return s:warn('not in git repo')
   endif
 
-  let fugitive_repo = fugitive#repo(git_dir)
   let cd = exists('*haslocaldir') && haslocaldir() ? 'lcd' : 'cd'
   let cwd = getcwd()
-  let root = fugitive_repo.tree()
+  let root = FugitiveFind(':/')
   try
     if cwd !=# root
       execute cd escape(root, ' ')
@@ -310,14 +307,14 @@ function! s:gv(bang, visual, line1, line2, args) abort
       if len(a:args) > 1
         return s:warn('invalid arguments')
       endif
-      call s:check_buffer(fugitive_repo, expand('%'))
+      call s:check_buffer(expand('%'))
       call s:gl(bufnr(''), a:visual)
     else
-      let [opts1, paths1] = s:log_opts(fugitive_repo, a:bang, a:visual, a:line1, a:line2)
+      let [opts1, paths1] = s:log_opts(a:bang, a:visual, a:line1, a:line2)
       let [opts2, paths2] = s:split_pathspec(gv#shellwords(a:args))
       let log_opts = opts1 + opts2 + paths1 + paths2
-      call s:setup(git_dir, fugitive_repo.config('remote.origin.url'))
-      call s:list(fugitive_repo, log_opts)
+      call s:setup(FugitiveConfigGet('remote.origin.url'))
+      call s:list(log_opts)
       call FugitiveDetect(@#)
     endif
   catch
