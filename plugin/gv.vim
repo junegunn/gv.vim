@@ -313,7 +313,7 @@ function! s:gv(bang, visual, line1, line2, args) abort
       let [opts1, paths1] = s:log_opts(a:bang, a:visual, a:line1, a:line2)
       let [opts2, paths2] = s:split_pathspec(gv#shellwords(a:args))
       let log_opts = opts1 + opts2 + paths1 + paths2
-      call s:setup(FugitiveConfigGet('remote.origin.url'))
+      call s:setup(FugitiveRemoteUrl())
       call s:list(log_opts)
       call FugitiveDetect(@#)
     endif
@@ -326,8 +326,4 @@ function! s:gv(bang, visual, line1, line2, args) abort
   endtry
 endfunction
 
-function! s:gvcomplete(a, l, p) abort
-  return fugitive#repo().superglob(a:a)
-endfunction
-
-command! -bang -nargs=* -range=0 -complete=customlist,s:gvcomplete GV call s:gv(<bang>0, <count>, <line1>, <line2>, <q-args>)
+command! -bang -nargs=* -range=0 -complete=customlist,fugitive#CompleteObject GV call s:gv(<bang>0, <count>, <line1>, <line2>, <q-args>)
