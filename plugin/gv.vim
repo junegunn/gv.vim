@@ -263,7 +263,7 @@ function! s:gl(buf, visual)
     return
   endif
   tab split
-  silent execute a:visual ? "'<,'>" : "" 'Gllog'
+  silent execute a:visual ? "'<,'>Gllog" : '0Gllog'
   call setloclist(0, insert(getloclist(0), {'bufnr': a:buf}, 0))
   noautocmd b #
   lopen
