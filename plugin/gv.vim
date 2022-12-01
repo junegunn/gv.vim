@@ -214,6 +214,15 @@ function! s:list(log_opts)
   let bufname = repo_short_name.' '.join(a:log_opts)
   silent exe (bufexists(bufname) ? 'buffer' : 'file') fnameescape(bufname)
 
+  let show_stash_cmd = call(a:fugitive_repo.git_command, ['reflog']+['show']+['--format=%h']+['stash'], a:fugitive_repo)
+  let stash_list_cmd = call(a:fugitive_repo.git_command, ['stash']+['list'], a:fugitive_repo)
+
+  let stashlist = system(stash_list_cmd)
+  if stashlist == ""
+    let git_log_cmd = git_log_cmd 
+  else
+    let git_log_cmd = git_log_cmd . " $(" . show_stash_cmd . ")"
+  endif
   call s:fill(git_log_cmd)
   setlocal nowrap tabstop=8 cursorline iskeyword+=#
 
