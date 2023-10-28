@@ -321,7 +321,7 @@ function! s:gv(bang, visual, line1, line2, args) abort
     return s:warn(v:exception)
   finally
     if getcwd() !=# cwd
-      cd -
+      execute cd escape(cwd, ' ')
     endif
   endtry
 endfunction
