@@ -84,11 +84,19 @@ endfunction
 function! s:split(tab)
   if a:tab
     call s:tabnew()
-  elseif getwinvar(winnr('$'), 'gv')
-    $wincmd w
-    enew
   else
-    vertical botright new
+    let l:gv_win = 0
+    for l:win_number in range(1, winnr('$'))
+      if getwinvar(l:win_number, 'gv')
+        let l:gv_win = l:win_number
+      endif
+    endfor
+    if l:gv_win
+      call win_gotoid(win_getid(l:gv_win))
+    else
+      vertical botright new
+    end
+    enew
   endif
   let w:gv = 1
 endfunction
