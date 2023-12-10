@@ -84,11 +84,14 @@ endfunction
 function! s:split(tab)
   if a:tab
     call s:tabnew()
-  elseif getwinvar(winnr('$'), 'gv')
-    $wincmd w
-    enew
   else
-    vertical botright new
+    let w = get(filter(range(1, winnr('$')), 'getwinvar(v:val, "gv")'), 0)
+    if w
+      execute w.'wincmd w'
+      enew
+    else
+      vertical botright new
+    endif
   endif
   let w:gv = 1
 endfunction
