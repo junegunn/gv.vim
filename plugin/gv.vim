@@ -129,6 +129,8 @@ function! s:dot()
 endfunction
 
 function! s:maps()
+  nnoremap <buffer> <Plug>(gv-refresh) :<c-u>call <sid>refresh()<cr>
+
   nnoremap <silent> <buffer> q    :$wincmd w <bar> close<cr>
   nnoremap <silent> <buffer> <nowait> gq :$wincmd w <bar> close<cr>
   nnoremap <silent> <buffer> gb   :call <sid>gbrowse()<cr>
@@ -320,6 +322,13 @@ function! s:gv(bang, visual, line1, line2, args) abort
       call s:list(log_opts)
       call FugitiveDetect(@#)
     endif
+    let b:gv_opts = {
+          \ 'bang' : a:bang,
+          \ 'visual' : a:visual,
+          \ 'line1' : a:line1,
+          \ 'line2' : a:line2,
+          \ 'args' : a:args,
+          \ }
   catch
     return s:warn(v:exception)
   finally
@@ -327,6 +336,19 @@ function! s:gv(bang, visual, line1, line2, args) abort
       execute cd escape(cwd, ' ')
     endif
   endtry
+endfunction
+
+function! s:refresh() abort
+  let lazyredraw_bak = &lazyredraw
+  let &lazyredraw = 1
+
+  let win = winsaveview()
+  let old_tab = tabpagenr()
+  call s:gv(b:gv_opts.bang, b:gv_opts.visual, b:gv_opts.line1, b:gv_opts.line2, b:gv_opts.args)
+  exec 'tabclose '. old_tab
+  call winrestview(win)
+
+  let &lazyredraw = lazyredraw_bak
 endfunction
 
 command! -bang -nargs=* -range=0 -complete=customlist,fugitive#CompleteObject GV call s:gv(<bang>0, <count>, <line1>, <line2>, <q-args>)
