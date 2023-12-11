@@ -329,4 +329,4 @@ function! s:gv(bang, visual, line1, line2, args) abort
   endtry
 endfunction
 
-command! -bang -nargs=* -range=0 -complete=customlist,fugitive#CompleteObject GV call s:gv(<bang>0, <count>, <line1>, <line2>, <q-args>)
+command! -bang -nargs=* -range=0 -complete=customlist,fugitive#LogComplete GV call s:gv(<bang>0, <count>, <line1>, <line2>, <q-args>)
