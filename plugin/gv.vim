@@ -199,13 +199,25 @@ function! s:check_buffer(current)
   endif
 endfunction
 
+let s:graph_cache = {}
+
+function! s:use_graph()
+  let max = get(g:, 'gv_graph_max_merges', 1000)
+  let dir = FugitiveGitDir()
+  if !has_key(s:graph_cache, dir)
+    let out = system(FugitiveShellCommand(['rev-list', '--merges', '--max-count='.max, '--count', 'HEAD']))
+    let s:graph_cache[dir] = !v:shell_error && str2nr(out) < max
+  endif
+  return s:graph_cache[dir]
+endfunction
+
 function! s:log_opts(bang, visual, line1, line2)
   if a:visual || a:bang
     let current = expand('%')
     call s:check_buffer(current)
     return a:visual ? [[printf('-L%d,%d:%s', a:line1, a:line2, current)], []] : [['--follow'], ['--', current]]
   endif
-  return [['--graph'], []]
+  return [s:use_graph() ? ['--graph'] : [], []]
 endfunction
 
 function! s:list(log_opts)
