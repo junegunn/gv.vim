@@ -1,0 +1,59 @@
+gv.txt gv
+
+GV.VIM                                                      *gv-vim* *git-gv*
+==============================================================================
+
+A git commit browser usable on projects with thousands of commits.
+
+
+                                                                       *gv-1*
+INSTALLATION                                                *gv-installation*
+==============================================================================
+
+Use your favorite plugin manager.
+
+ - {vim-plug}{1}
+
+  1. Plug 'tpope/vim-fugitive'
+  2. Plug 'junegunn/gv.vim'
+
+                                      {1} https://github.com/junegunn/vim-plug
+
+
+                                                                       *gv-2*
+COMMANDS                                                        *gv-commands*
+==============================================================================
+
+                                                                        *:GV*
+:GV to open commit browser
+You can pass git log options to the command, e.g. :GV -S foobar.
+
+                                                                       *:GV!*
+:GV! will only list commits that affected the current file
+
+                                                                       *:GV?*
+:GV? fills the location list with the revisions of the current file
+
+                                                                      *:v_GV*
+:GV or :GV? can be used in visual mode to track the changes in the selected
+lines.
+
+                                                                       *gv-3*
+MAPPINGS                                                        *gv-mappings*
+==============================================================================
+
+ -----------------------+---------------+---------------------------------------------------------
+  Mapping               | Mode          | Description                                            ~
+ -----------------------+---------------+---------------------------------------------------------
+  o or <cr> on a commit | normal        | Display the content of commit                           
+  o or <cr> on commits  | visual        | Display the diff in the range                           
+  O                     | normal/visual | Like `o`, but opens a new tab instead                     
+  gb                    | normal        | |:Gbrowse|                                                
+  ]] and [[             | normal/visual | Move between commits                                    
+  .                     | normal        | Begin `:Git [CURSOR] SHA` à la fugitive 
+  q                     | normal        | Close                                                   
+ -----------------------+---------------+---------------------------------------------------------
+
+
+==============================================================================
+vim:tw=78:sw=2:ts=2:ft=help:norl:nowrap:
